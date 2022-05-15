@@ -5,7 +5,8 @@ from PyQt5.QtWidgets import QMainWindow, \
                             QMenu, \
                             QMenuBar, \
                             QAction, QTableWidget
-
+#// Custom
+from dialogs.dialog_add_data_person import AddCustomDialog
 
 
 
@@ -53,6 +54,18 @@ class MainWindow(QMainWindow):
     def _connect_actions(self):
         """Connect actions to menubar."""
         self.exit_app.triggered.connect(lambda: exit())
+        self.add_data_person.triggered.connect(self._run_table_add_custom)
+
+
+    def _run_table_add_custom(self):
+        """Add table of class AddCustomDialog"""
+        self.dialog_window_add = AddCustomDialog()
+        self.dialog_window_add.show()
+
+    
+    def _run_table_change_custom(self):
+        """Add table of class ChangeCustomDialog"""
+        pass
 
 
     def _create_table(self):
