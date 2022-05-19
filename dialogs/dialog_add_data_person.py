@@ -8,11 +8,10 @@ import json
 from os import stat
 
 
-#// Custom
-
 
 
 class AddCustomDialog(QDialog):
+
 
     def __init__(self):
         super().__init__()
@@ -26,7 +25,7 @@ class AddCustomDialog(QDialog):
         self._set_signals()
     
     
-    def _create_widgets(self):
+    def _create_widgets(self) -> None:
         """Create widgets in dialog window."""
         #// Create Labels
         self.label_surname = QLabel("Фамилия", self)
@@ -62,7 +61,7 @@ class AddCustomDialog(QDialog):
         self.push_button_okey.move(160, 200)
 
 
-    def _set_signals(self):
+    def _set_signals(self) -> None:
         """Set signals to widgets."""
         #// Signals to LineEdits
         self.line_edit_surname.textEdited.connect(lambda: self._validate_values(
@@ -81,7 +80,7 @@ class AddCustomDialog(QDialog):
         self.push_button_okey.clicked.connect(self._write_data_in_database)
         self.push_button_cancel.clicked.connect(lambda: self.close())
         
-    def _validate_values(self, value, box_id):
+    def _validate_values(self, value: str, box_id: str) -> None:
         """Validate values in textEdited boxed."""
         match box_id:
             case "surname":
@@ -116,6 +115,7 @@ class AddCustomDialog(QDialog):
                             "Введите телефон в формате - +7(961)-702-55-42")
                     self._clear_cell(self.line_edit_phone_number)
                     self.push_button_okey.setDisabled(True)
+
         try:
             if self.line_edit_surname.text() not in ("", None) and \
                self.line_edit_name.text() not in ("", None) and \
@@ -126,16 +126,15 @@ class AddCustomDialog(QDialog):
             self.push_button_okey.setDisabled(True)
 
 
-    def _clear_cell(self, name_of_line_edit):
+    def _clear_cell(self, name_of_line_edit) -> None:
         """Block signals and clear cell, when arises warning."""
         name_of_line_edit.blockSignals(True)
         name_of_line_edit.setText('')
         name_of_line_edit.blockSignals(False)
         
 
-    def _write_data_in_database(self):
+    def _write_data_in_database(self) -> None:
         """Write dict with data of custom in JSON file."""
-
         with open("database.json", "r", encoding="utf-8") as json_file_read:
             if stat("database.json").st_size > 2:
                 file_data = json.load(json_file_read)

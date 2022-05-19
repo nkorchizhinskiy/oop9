@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QMainWindow, \
                             QMenuBar, \
                             QAction, QMessageBox, QTableWidget, \
                             QTableWidgetItem
+
 #// Custom
 from dialogs.dialog_add_data_person import AddCustomDialog
 from dialogs.dialog_change_data_person import ChangeCustomData
@@ -31,7 +32,6 @@ class MainWindow(QMainWindow):
         self._connect_actions() 
         self._create_table()
         self.update_table()
-
 
 
     def _create_widgets(self) -> None:
@@ -61,7 +61,7 @@ class MainWindow(QMainWindow):
         self.exit_app = QAction("Закрыть приложение", self)
         
 
-    def _connect_actions(self):
+    def _connect_actions(self) -> None:
         """Connect actions to menubar."""
         self.exit_app.triggered.connect(lambda: exit())
         self.add_data_person.triggered.connect(self._run_table_add_custom)
@@ -69,14 +69,14 @@ class MainWindow(QMainWindow):
         self.clear_data_person.triggered.connect(self._delete_custom)
 
 
-    def _run_table_add_custom(self):
+    def _run_table_add_custom(self) -> None:
         """Add table of class AddCustomDialog"""
         self.dialog_window_add = AddCustomDialog()
         self.dialog_window_add.show()
         self.dialog_window_add.push_button_okey.clicked.connect(self.update_table)
 
 
-    def _run_table_change_custom(self):
+    def _run_table_change_custom(self) -> None:
         """Add table of class ChangeCustomDialog"""
         if stat("database.json").st_size > 2:
             current_row = self.main_table.currentRow()
@@ -93,7 +93,8 @@ class MainWindow(QMainWindow):
                     "поэтому изменять его нельзя!")
 
 
-    def _delete_custom(self):
+    def _delete_custom(self) -> None:
+        """Delete data about custom from JSON file"""
         if stat("database.json").st_size > 2:
             current_row = self.main_table.currentRow()
             self._write_data_in_database(current_row)
@@ -105,19 +106,19 @@ class MainWindow(QMainWindow):
         self.update_table()
         
 
-
     def _write_data_in_database(self, current_row):
         """Write dict with data of custom in JSON file."""
 
         with open("database.json", "r", encoding="utf-8") as json_file_read:
             if stat("database.json").st_size != 0:
                 file_data = json.load(json_file_read)
-
+                
+                #// Source custom in database and delete
                 for key, data in list(file_data.items()):
                     if data[0] == self.main_table.item(current_row, 0).text() and \
-                       data[1] == self.main_table.item(current_row, 1).text():
-                       #data[2] == self.main_table.item(current_row, 2).text() and \
-                       #data[2] == self.main_table.item(current_row, 3).text():
+                       data[1] == self.main_table.item(current_row, 1).text() and \
+                       data[2] == self.main_table.item(current_row, 2).text() and \
+                       data[3] == self.main_table.item(current_row, 3).text():
                            del file_data[key]
 
                 with open("database.json", "w", encoding="utf-8") as json_file_append:
