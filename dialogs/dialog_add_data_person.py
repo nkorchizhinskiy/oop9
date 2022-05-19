@@ -2,7 +2,13 @@ from PyQt5.QtWidgets import QDialog, QMessageBox, \
                             QPushButton, \
                             QLineEdit, \
                             QLabel
+
 import re
+import json
+from os import stat
+
+
+#// Custom
 
 
 
@@ -11,10 +17,10 @@ class AddCustomDialog(QDialog):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Add new custom")
+
         #// Values
         self.customers = {}
-        #// CONST
-        self.id = 1
+
         #// Run fucntions
         self._create_widgets()
         self._set_signals()
@@ -83,8 +89,7 @@ class AddCustomDialog(QDialog):
                     QMessageBox.information(
                             self,
                             "Предупреждение",
-                            "Вам не нужно использовать цифры и другие символы,\
-                             кроме букв!")
+                            "Вам не нужно использовать цифры и другие символы, кроме букв!")
                     self._clear_cell(self.line_edit_surname)
                     self.push_button_okey.setDisabled(True)
             case "name":
@@ -92,8 +97,7 @@ class AddCustomDialog(QDialog):
                     QMessageBox.information(
                             self,
                             "Предупреждение",
-                            "Вам не нужно использовать цифры и другие символы,\
-                             кроме букв!")
+                            "Вам не нужно использовать цифры и другие символы, кроме букв!")
                     self._clear_cell(self.line_edit_name)
                     self.push_button_okey.setDisabled(True)
             case "second_name":
@@ -101,8 +105,7 @@ class AddCustomDialog(QDialog):
                     QMessageBox.information(
                             self,
                             "Предупреждение",
-                            "Вам не нужно использовать цифры и другие символы,\
-                             кроме букв!")
+                            "Вам не нужно использовать цифры и другие символы, кроме букв!")
                     self._clear_cell(self.line_edit_second_name)
                     self.push_button_okey.setDisabled(True)
             case "phone":
@@ -119,7 +122,7 @@ class AddCustomDialog(QDialog):
                self.line_edit_second_name.text() not in ("", None) and \
                self.line_edit_phone_number.text() not in ("", None):
                    self.push_button_okey.setDisabled(False)
-        except Exception as e:
+        except Exception:
             self.push_button_okey.setDisabled(True)
 
 
@@ -130,5 +133,38 @@ class AddCustomDialog(QDialog):
         name_of_line_edit.blockSignals(False)
         
 
-    def _write_data_in_database(self, surname, name, second_name, phone):
-        self.customers[self.id] = []
+    def _write_data_in_database(self):
+        """Write dict with data of custom in JSON file."""
+
+        with open("database.json", "r", encoding="utf-8") as json_file_read:
+            if stat("database.json").st_size > 2:
+                file_data = json.load(json_file_read)
+                maximum_id = max(map(int, file_data.keys()))
+
+                self.customers[str(maximum_id+1)] = [
+                        self.line_edit_surname.text(),
+                        self.line_edit_name.text(),
+                        self.line_edit_second_name.text(),
+                        self.line_edit_phone_number.text()
+                        ]
+                file_data.update(self.customers)
+
+                with open("database.json", "w", encoding="utf-8") as json_file_append:
+                    json_file_append.write(json.dumps(file_data,\
+                            indent=4, ensure_ascii=False))
+            else:
+                with open("database.json", "w", encoding="utf-8") as json_file_append:
+                    self.customers[1] = [
+                            self.line_edit_surname.text(),
+                            self.line_edit_name.text(),
+                            self.line_edit_second_name.text(),
+                            self.line_edit_phone_number.text()
+                            ]
+                    json_file_append.write(json.dumps(self.customers,\
+                            indent=4, ensure_ascii=False))
+                
+        self.close()
+
+
+    
+
